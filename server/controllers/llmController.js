@@ -1,51 +1,115 @@
-const axios = require('axios');
-const FormData = require('form-data');
-const fs = require('fs');
-const db = require('../config/firebaseConfig');
+const axios = require("axios");
+
+const { OpenAI } = require("openai");
+const { Anthropic } = require("@anthropic-ai/sdk");
+
+async function getChatGPTResponse(question) {
+	const apiKey = process.env.OPENAI_API_KEY;
+	const openai = new OpenAI({ apiKey });
+
+	const completion = await openai.chat.completions.create({
+		messages: [
+			{ role: "system", content: "You are a helpful assistant." },
+			{ role: "user", content: question },
+		],
+		model: "gpt-4o",
+	});
+	return completion.choices[0].message.content;
+}
+
+async function getClaudeResponse(question) {
+	// return "Claude response";
+	const apiKey = process.env.CLAUDE_API_KEY;
+	const anthropic = new Anthropic({
+		apiKey, // defaults to process.env["ANTHROPIC_API_KEY"]
+	});
+
+	const msg = await anthropic.messages.create({
+		model: "claude-3-5-sonnet-20240620",
+		max_tokens: 1024,
+		messages: [{ role: "user", content: "Hello, Claude" }],
+	});
+	return msg.choices[0].message.content;
+}
+
+async function getGroqResponse(question) {
+	return "Groq response";
+
+	const apiKey = "YOUR_GROQ_API_KEY";
+	const response = await axios.post(
+		"https://api.groq.com/v1/groq",
+		{
+			prompt: question,
+			max_tokens: 100,
+		},
+		{
+			headers: {
+				Authorization: `Bearer ${apiKey}`,
+				"Content-Type": "application/json",
+			},
+		}
+	);
+	return response.data.choices[0].text.trim();
+}
 
 exports.postQueryWithImage = async (req, res) => {
-  const { query, uid } = req.body;
-  const image = req.file;
+	const { question } = req.body;
+	const image = req.file;
 
-  let extractedText = '';
-  if (image) {
-    const formData = new FormData();
-    formData.append('image', fs.createReadStream(image.path));
-    
-    try {
-      const visionResponse = await axios.post('https://vision.googleapis.com/v1/images:annotate', formData, {
-        headers: {
-          Authorization: `Bearer ${process.env.GOOGLE_VISION_API_KEY}`,
-        },
-      });
-      extractedText = visionResponse.data.textAnnotations[0].description || '';
-    } catch (error) {
-      console.error('Error analyzing image:', error);
-      return res.status(500).json({ error: 'Error analyzing image' });
-    }
-  }
+	console.log("Query:", question);
+	console.log("Image:", image);
 
-  const fullQuery = query || extractedText;
+	// Add your logic to handle the request here
 
-  const llmResponses = [
-    { modelName: 'GPT', response: 'GPT response based on ' + fullQuery },
-    { modelName: 'Claude', response: 'Claude response based on ' + fullQuery },
-    { modelName: 'OtherLLM', response: 'Other LLM response based on ' + fullQuery },
-  ];
+	res.json({
+		chatgpt: {
+			question,
+			qImage: image,
+			response: "ChatGPT response",
+		},
+		claude: {
+			question,
+			qImage: image,
+			response: "Claude response",
+		},
+		groq: {
+			question,
+			qImage: image,
+			response: "Groq response",
+		},
+	});
+};
 
-  const chatData = {
-    userId: uid,
-    query: fullQuery,
-    responses: llmResponses,
-    imageUrl: image ? `/uploads/${image.filename}` : null,
-    timestamp: new Date().toISOString(),
-  };
+exports.postQueryWithoutImage = async (req, res) => {
+	const question = req.query.question;
+	console.log("Received question:", question);
 
-  try {
-    await db.collection('chats').add(chatData);
-    res.json({ message: 'Chat saved successfully', responses: llmResponses });
-  } catch (error) {
-    console.error('Error saving chat:', error);
-    res.status(500).json({ error: 'Error saving chat' });
-  }
+	const responses = {
+		chatgpt: { question, response: null },
+		claude: { question, response: null },
+		groq: { question, response: null },
+	};
+
+	try {
+		responses.chatgpt.response = await getChatGPTResponse(question);
+	} catch (error) {
+		console.error("Error fetching ChatGPT response:", error);
+		responses.chatgpt.response = "Error fetching ChatGPT response";
+	}
+
+	try {
+		responses.claude.response = await getClaudeResponse(question);
+	} catch (error) {
+		console.error("Error fetching Claude response:", error);
+		responses.claude.response = "Error fetching Claude response";
+	}
+
+	try {
+		responses.groq.response = await getGroqResponse(question);
+	} catch (error) {
+		console.error("Error fetching Groq response:", error);
+		responses.groq.response = "Error fetching Groq response";
+	}
+
+	res.json(responses);
 };

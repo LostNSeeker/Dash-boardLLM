@@ -1,19 +1,12 @@
-import { initializeApp } from 'firebase/app';
-import { getAuth, RecaptchaVerifier } from 'firebase/auth';
+const { initializeApp } = require("firebase-admin/app");
+const { getFirestore } = require("firebase-admin/firestore");
+const admin = require("firebase-admin");
 
-const firebaseConfig = {
-  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.REACT_APP_FIREBASE_APP_ID,
-};
+const serviceAccount = require("./firebaseServiceAccountKey.json"); // Download from Firebase Console
 
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
+initializeApp({
+	credential: admin.credential.cert(serviceAccount),
+});
 
-// Recaptcha verifier
-export const setupRecaptcha = (elementId) => {
-  return new RecaptchaVerifier(elementId, {}, auth);
-};
+const db = getFirestore();
+module.exports = db;
