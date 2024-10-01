@@ -29,7 +29,8 @@ async function getClaudeResponse(question) {
 		max_tokens: 1024,
 		messages: [{ role: "user", content: "Hello, Claude" }],
 	});
-	return msg.choices[0].message.content;
+	console.log(msg);
+	return msg.content[0].text;
 }
 
 async function getGroqResponse(question) {
