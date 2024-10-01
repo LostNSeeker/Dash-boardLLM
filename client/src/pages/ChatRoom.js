@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./ChatRoom.css";
 import { useAuth } from "../context/AuthContext";
+import { useSearchParams } from "react-router-dom";
+
 const ChatRoom = () => {
 	const [messages, setMessages] = useState([]);
 
@@ -10,8 +12,16 @@ const ChatRoom = () => {
 	const [username, setUsername] = useState(currentUser.name);
 	const ws = useRef(null);
 
+	// Get the username from the URL query string
+	const [searchParams] = useSearchParams();
+	const queryMessage = searchParams.get("message");
+
 	// Connect to WebSocket server when the component mounts
 	useEffect(() => {
+		if (queryMessage) {
+			setInputValue(queryMessage);
+		}
+
 		ws.current = new WebSocket("ws://localhost:5000"); // Adjust the URL if necessary
 
 		ws.current.onopen = () => {

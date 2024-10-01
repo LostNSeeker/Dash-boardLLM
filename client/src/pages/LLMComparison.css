@@ -13,6 +13,7 @@
     padding-top: 5px;
     text-align: center;
     border-radius: 10px;
+    position: relative;
 }
 
 .llm-comparison {
@@ -91,4 +92,15 @@
 .response-div p {
     margin: 10px 0;
     color: #333;
+}
+
+.fullscreen-btn {
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 20px;
+    position: absolute;
+    top: 5px;
+    left: 5px;
 }

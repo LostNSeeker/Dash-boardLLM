@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import "./LLMComparison.css";
 
 const LLMComparison = () => {
@@ -12,6 +13,7 @@ const LLMComparison = () => {
 	const chatgptRef = useRef(null);
 	const claudeRef = useRef(null);
 	const groqRef = useRef(null);
+	const navigate = useNavigate();
 
 	const handleInputChange = (e) => {
 		setQuestion(e.target.value);
@@ -76,6 +78,46 @@ const LLMComparison = () => {
 		document.getElementById("fileInput").click();
 	};
 
+	const handleShare = (response, AIModel) => {
+		response = AIModel + ": \n" + response;
+		navigate(`/dashboard?message=${encodeURIComponent(response)}`);
+	};
+
+	const handleFullscreen = (e) => {
+		const card = e.target.closest(".card");
+		const parent = card.parentElement;
+		const cards = parent.children;
+
+		for (let i = 0; i < cards.length; i++) {
+			cards[i].style.display = "none";
+		}
+
+		card.style.display = "block";
+		card.style.width = "100%";
+
+		const backButton = document.createElement("div");
+		backButton.className = "fullscreen-btn back-btn";
+		backButton.innerText = "B";
+		backButton.onclick = handleBackToNormalScreen;
+		card.appendChild(backButton);
+	};
+
+	const handleBackToNormalScreen = (e) => {
+		const card = e.target.closest(".card");
+		const parent = card.parentElement;
+		const cards = parent.children;
+
+		for (let i = 0; i < cards.length; i++) {
+			cards[i].style.display = "block";
+			cards[i].style.width = "32%";
+		}
+
+		const backButton = card.querySelector(".back-btn");
+		if (backButton) {
+			card.removeChild(backButton);
+		}
+	};
+
 	useEffect(() => {
 		if (chatgptRef.current) {
 			setTimeout(
@@ -104,6 +146,9 @@ const LLMComparison = () => {
 				<div className="comparison-cards">
 					<div className="card">
 						<h4>ChatGPT</h4>
+						<div className="fullscreen-btn" onClick={handleFullscreen}>
+							F
+						</div>
 						<div className="res-div">
 							{responses.chatgpt.map((response, index) => (
 								<div
@@ -128,6 +173,11 @@ const LLMComparison = () => {
 									<div className="response-div">
 										Response:
 										<p>{response.response}</p>
+										<button
+											onClick={() => handleShare(response.response, "ChatGPT")}
+										>
+											Share
+										</button>
 									</div>
 								</div>
 							))}
@@ -135,6 +185,10 @@ const LLMComparison = () => {
 					</div>
 					<div className="card">
 						<h4>Claude</h4>
+						<div className="fullscreen-btn" onClick={handleFullscreen}>
+							F
+						</div>
+
 						<div className="res-div">
 							{responses.claude.map((response, index) => (
 								<div
@@ -157,6 +211,11 @@ const LLMComparison = () => {
 									<div className="response-div">
 										Response:
 										<p>{response.response}</p>
+										<button
+											onClick={() => handleShare(response.response, "Claude")}
+										>
+											Share
+										</button>
 									</div>
 								</div>
 							))}
@@ -164,6 +223,10 @@ const LLMComparison = () => {
 					</div>
 					<div className="card">
 						<h4>Groq</h4>
+						<div className="fullscreen-btn" onClick={handleFullscreen}>
+							F
+						</div>
+
 						<div className="res-div">
 							{responses.groq.map((response, index) => (
 								<div
@@ -186,6 +249,11 @@ const LLMComparison = () => {
 									<div className="response-div">
 										Response:
 										<p>{response.response}</p>
+										<button
+											onClick={() => handleShare(response.response, "Groq")}
+										>
+											Share
+										</button>
 									</div>
 								</div>
 							))}
