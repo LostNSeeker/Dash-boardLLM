@@ -35,6 +35,7 @@ export const AuthProvider = ({ children }) => {
 						console.error("Error:", error);
 					});
 			}
+			setLoading(false)
 		});
 
 		return unsubscribe; // Cleanup subscription on unmount
