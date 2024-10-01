@@ -1,5 +1,5 @@
 const axios = require("axios");
-
+const db = require("../config/firebaseConfig");
 const { OpenAI } = require("openai");
 const { Anthropic } = require("@anthropic-ai/sdk");
 
@@ -83,6 +83,7 @@ exports.postQueryWithImage = async (req, res) => {
 
 exports.postQueryWithoutImage = async (req, res) => {
 	const question = req.query.question;
+	const userId = req.query.userId;
 	console.log("Received question:", question);
 
 	const responses = {
@@ -112,5 +113,44 @@ exports.postQueryWithoutImage = async (req, res) => {
 		responses.groq.response = "Error fetching Groq response";
 	}
 
+	//save response to database
+	//modify the response object to include the user id
+	responses.userId = userId;
+	responses.createdAt = new Date().toISOString();
+
+	const response = await db.collection("responses").add(responses);
+	console.log("Response saved to database:", response.id);
+
 	res.json(responses);
+};
+
+exports.getUserResponses = async (req, res) => {
+	const userId = req.query.userId;
+	if (!userId) {
+		return res.status(400).json({ error: "User ID is required" });
+	}
+
+	try {
+		const responsesSnapshot = await db
+			.collection("responses")
+			.where("userId", "=", userId)
+			.get();
+
+		console.log(responsesSnapshot);
+		if (responsesSnapshot.empty) {
+			return res
+				.status(404)
+				.json({ error: "No responses found for this user" });
+		}
+
+		const responses = [];
+		responsesSnapshot.forEach((doc) => {
+			responses.push({ id: doc.id, ...doc.data() });
+		});
+
+		res.json(responses);
+	} catch (error) {
+		console.error("Error fetching user responses:", error);
+		res.status(500).json({ error: "Error fetching user responses" });
+	}
 };

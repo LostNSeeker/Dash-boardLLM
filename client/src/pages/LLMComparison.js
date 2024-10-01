@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import "./LLMComparison.css";
 
 const LLMComparison = () => {
@@ -14,6 +15,8 @@ const LLMComparison = () => {
 	const claudeRef = useRef(null);
 	const groqRef = useRef(null);
 	const navigate = useNavigate();
+
+	const { currentUser } = useAuth();
 
 	const handleInputChange = (e) => {
 		setQuestion(e.target.value);
@@ -34,6 +37,8 @@ const LLMComparison = () => {
 			const formData = new FormData();
 			formData.append("image", image);
 			formData.append("question", question);
+			formData.append("userId", currentUser.uid);
+
 			const response = await fetch(
 				"http://localhost:5000/api/llm/queryWithImage",
 				{
@@ -45,7 +50,7 @@ const LLMComparison = () => {
 			return data;
 		} else {
 			const response = await fetch(
-				`http://localhost:5000/api/llm?question=${question}`
+				`http://localhost:5000/api/llm?question=${question}&userId=${currentUser.uid}`
 			);
 			const data = await response.json();
 			return data;
@@ -138,6 +143,42 @@ const LLMComparison = () => {
 			);
 		}
 	}, [responses.chatgpt, responses.claude, responses.groq]);
+
+	//syncing with the backend
+	useEffect(() => {
+		if (!currentUser) return;
+		const fetchResponses = async () => {
+			const response = await fetch(
+				`http://localhost:5000/api/llm/getUserResponses?userId=${currentUser.uid}`
+			);
+			const data = await response.json();
+			console.log(data);
+
+			if (response.status === 200) {
+				const res = {};
+
+				// Iterate over the data array
+				data.forEach((item) => {
+					// Iterate over the keys of each object in the data array
+					Object.keys(item).forEach((key) => {
+						// If the key does not exist in res, initialize it as an empty array
+						if (!res[key]) {
+							res[key] = [];
+						}
+						//add only if key is chatgpt, claude or groq
+						if (key !== "chatgpt" && key !== "claude" && key !== "groq") return;
+						// Append the responses to the corresponding key in the res object
+						res[key] = res[key].concat(item[key]);
+					});
+				});
+
+				setResponses(res);
+				console.log(res);
+			}
+		};
+
+		fetchResponses();
+	}, [currentUser]);
 
 	return (
 		<div className="content">

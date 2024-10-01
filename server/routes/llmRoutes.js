@@ -3,6 +3,7 @@ const multer = require("multer");
 const {
 	postQueryWithImage,
 	postQueryWithoutImage,
+	getUserResponses,
 } = require("../controllers/llmController");
 const router = express.Router();
 
@@ -28,5 +29,7 @@ const upload = multer({
 router.post("/queryWithImage", upload.single("image"), postQueryWithImage);
 
 router.get("/", postQueryWithoutImage);
+
+router.get("/getUserResponses", getUserResponses);
 
 module.exports = router;
