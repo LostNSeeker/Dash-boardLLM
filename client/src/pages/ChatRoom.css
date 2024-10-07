@@ -16,6 +16,12 @@
 }
 
 
+.chat-room h2{
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+
 .chat-history {
     flex: 1;
     padding: 10px;
