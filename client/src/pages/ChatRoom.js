@@ -3,6 +3,7 @@ import "./ChatRoom.css";
 import { useAuth } from "../context/AuthContext";
 import { useSearchParams } from "react-router-dom";
 
+
 const ChatRoom = () => {
 	const [messages, setMessages] = useState([]);
 
@@ -71,6 +72,7 @@ const ChatRoom = () => {
 		}
 	};
 
+
 	return (
 		<div className="chat-room">
 			<h2 style={{ textAlign: "center" }}>Chat Room</h2>
@@ -83,8 +85,22 @@ const ChatRoom = () => {
 						}`}
 						style={{
 							textAlign: msg.sender === username ? "right" : "left",
+							display: "flex", // Align image and text side by side
+          					justifyContent: msg.sender === username ? "flex-end" : "flex-start", // Position accordingly
+							position: "relative", // Required for positioning reactions
 						}}
+						
 					>
+						
+						{msg.sender !== username && (
+          					<img
+            					src={msg.profileImage || "https://via.placeholder.com/30"}
+            					alt="avatar"
+            					style={{ borderRadius: "50%", marginRight: "10px" }} // Profile image style
+          					/>
+       					 )}
+
+					<div>
 						{msg.sender !== username && (
 							<strong style={{ color: msg.color }}>{msg.sender}: </strong>
 						)}
@@ -93,8 +109,13 @@ const ChatRoom = () => {
 							{" "}
 							{new Date(msg.timestamp).toLocaleTimeString()}
 						</span>
+
+						
 					</div>
+					</div>
+					
 				))}
+				
 			</div>
 
 			<form className="input-box">

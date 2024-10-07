@@ -3,13 +3,18 @@
     flex-direction: column;
     height: 100vh;
     width: 98%;
-   
     margin: 3px auto;
     border: 1px solid #ccc;
     border-radius: 8px;
     overflow: hidden;
     background-color: #f9f9f9;
 }
+
+.chat-room h2{
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
 
 .chat-history {
     flex: 1;
@@ -104,6 +109,8 @@
     margin: 5px 0;
     align-self: flex-end;
     max-width: 70%;
+    margin-right: 20px;
+    height: auto;
 }
 
 .chat-message.other {
@@ -113,6 +120,8 @@
     margin: 5px 0;
     align-self: flex-start;
     max-width: 70%;
+    align-items: center;
+    margin-left: 20px;
 }
 
 .timestamp {
@@ -120,4 +129,8 @@
     color: #999;
     margin-left: 10px;
 }
+
+
+
+  
 
