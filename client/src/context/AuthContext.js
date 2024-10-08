@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
 	useEffect(() => {
 		const unsubscribe = onAuthStateChanged(auth, (user) => {
 			if (user) {
-				fetch("http://localhost:5000/api/auth/getUser", {
+				fetch("https://dash-boardllm.onrender.com/api/auth/getUser", {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",

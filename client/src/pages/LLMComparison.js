@@ -40,7 +40,7 @@ const LLMComparison = () => {
 			formData.append("userId", currentUser.uid);
 
 			const response = await fetch(
-				"http://localhost:5000/api/llm/queryWithImage",
+				"https://dash-boardllm.onrender.com/api/llm/queryWithImage",
 				{
 					method: "POST",
 					body: formData,
@@ -50,7 +50,7 @@ const LLMComparison = () => {
 			return data;
 		} else {
 			const response = await fetch(
-				`http://localhost:5000/api/llm?question=${question}&userId=${currentUser.uid}`
+				`https://dash-boardllm.onrender.com/api/llm?question=${question}&userId=${currentUser.uid}`
 			);
 			const data = await response.json();
 			return data;
@@ -149,7 +149,7 @@ const LLMComparison = () => {
 		if (!currentUser) return;
 		const fetchResponses = async () => {
 			const response = await fetch(
-				`http://localhost:5000/api/llm/getUserResponses?userId=${currentUser.uid}`
+				`https://dash-boardllm.onrender.com/api/llm/getUserResponses?userId=${currentUser.uid}`
 			);
 			const data = await response.json();
 			console.log(data);
@@ -204,7 +204,7 @@ const LLMComparison = () => {
 											<h5>{response.question}</h5>
 											{response.qImage && (
 												<img
-													src={"http://localhost:5000/" + response.qImage.path}
+													src={"https://dash-boardllm.onrender.com/" + response.qImage.path}
 													alt="Image"
 													style={{ width: "30%" }}
 												/>
@@ -242,7 +242,7 @@ const LLMComparison = () => {
 											<h5>{response.question}</h5>
 											{response.qImage && (
 												<img
-													src={"http://localhost:5000/" + response.qImage.path}
+													src={"https://dash-boardllm.onrender.com/" + response.qImage.path}
 													alt="Image"
 													style={{ width: "30%" }}
 												/>
@@ -280,7 +280,7 @@ const LLMComparison = () => {
 											<h5>{response.question}</h5>
 											{response.qImage && (
 												<img
-													src={"http://localhost:5000/" + response.qImage.path}
+													src={"https://dash-boardllm.onrender.com/" + response.qImage.path}
 													alt="Image"
 													style={{ width: "30%" }}
 												/>

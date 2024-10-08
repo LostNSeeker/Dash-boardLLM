@@ -103,8 +103,8 @@ const PhoneSignIn = () => {
 			toast.success("Phone verified");
 
 			const endpoint = isSignUp
-				? "http://localhost:5000/api/auth/signup"
-				: "http://localhost:5000/api/auth/login";
+				? "https://dash-boardllm.onrender.com/api/auth/signup"
+				: "https://dash-boardllm.onrender.com/api/auth/login";
 
 			const body = isSignUp
 				? { idToken, name, rollNumber, phoneNumber, color: getRandomColor() }

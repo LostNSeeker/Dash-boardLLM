@@ -80,7 +80,7 @@ const ChatRoom = () => {
       setInputValue(queryMessage);
     }
 
-    ws.current = new WebSocket("ws://localhost:5000"); // Adjust the URL if necessary
+    ws.current = new WebSocket("wss://dash-boardllm.onrender.com"); // Adjust the URL if necessary
 
     ws.current.onopen = () => {
       console.log("Connected to WebSocket server");
