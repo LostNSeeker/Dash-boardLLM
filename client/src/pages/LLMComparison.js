@@ -11,6 +11,7 @@ const LLMComparison = () => {
 		claude: [],
 		groq: [],
 	});
+	const [isLoading, setIsLoading] = useState(false);
 	const chatgptRef = useRef(null);
 	const claudeRef = useRef(null);
 	const groqRef = useRef(null);
@@ -60,23 +61,28 @@ const LLMComparison = () => {
 	const handleSubmit = async () => {
 		if (!question) return;
 
-		const allResponses = await fetchAllResponses(question, image);
-		console.log(allResponses);
-		const res = {
-			chatgpt: allResponses.chatgpt
-				? [...responses.chatgpt, allResponses.chatgpt]
-				: [...responses.chatgpt],
-			claude: allResponses.claude
-				? [...responses.claude, allResponses.claude]
-				: [...responses.claude],
-			groq: allResponses.groq
-				? [...responses.groq, allResponses.groq]
-				: [...responses.groq],
-		};
-		setResponses(res);
-
-		setQuestion("");
-		setImage(null);
+		setIsLoading(true);
+		try {
+			const allResponses = await fetchAllResponses(question, image);
+			const res = {
+				chatgpt: allResponses.chatgpt
+					? [...responses.chatgpt, allResponses.chatgpt]
+					: [...responses.chatgpt],
+				claude: allResponses.claude
+					? [...responses.claude, allResponses.claude]
+					: [...responses.claude],
+				groq: allResponses.groq
+					? [...responses.groq, allResponses.groq]
+					: [...responses.groq],
+			};
+			setResponses(res);
+			setQuestion("");
+			setImage(null);
+		} catch (error) {
+			console.error("Error fetching responses:", error);
+		} finally {
+			setIsLoading(false);
+		}
 	};
 
 	const triggerFileInput = () => {
@@ -180,126 +186,53 @@ const LLMComparison = () => {
 		fetchResponses();
 	}, [currentUser]);
 
+	const renderResponseCard = (title, responses, ref) => (
+		<div className="card">
+			<h4>{title}</h4>
+			<div className="fullscreen-btn" onClick={handleFullscreen}>
+				<i className="fas fa-expand"></i>
+			</div>
+			<div className="res-div">
+				{responses.map((response, index) => (
+					<div
+						key={index}
+						ref={index === responses.length - 1 ? ref : null}
+						className="response-item"
+					>
+						<div className="you-asked-div">
+							<strong>You asked:</strong>
+							<div>
+								<h5>{response.question}</h5>
+								{response.qImage && (
+									<img
+										src={`https://dash-boardllm.onrender.com/${response.qImage.path}`}
+										alt="Query"
+										style={{ width: "30%" }}
+									/>
+								)}
+							</div>
+						</div>
+						<div className="response-div">
+							<strong>Response:</strong>
+							<p>{response.response}</p>
+							<button onClick={() => handleShare(response.response, title)}>
+								Share
+							</button>
+						</div>
+					</div>
+				))}
+			</div>
+		</div>
+	);
+
 	return (
 		<div className="content">
 			<div className="llm-comparison">
 				<h3>Real-Time LLM Comparison</h3>
 				<div className="comparison-cards">
-					<div className="card">
-						<h4>ChatGPT</h4>
-						<div className="fullscreen-btn" onClick={handleFullscreen}>
-							F
-						</div>
-						<div className="res-div">
-							{responses.chatgpt.map((response, index) => (
-								<div
-									key={index}
-									ref={
-										index === responses.chatgpt.length - 1 ? chatgptRef : null
-									}
-								>
-									<div className="you-asked-div">
-										You asked:
-										<div>
-											<h5>{response.question}</h5>
-											{response.qImage && (
-												<img
-													src={"https://dash-boardllm.onrender.com/" + response.qImage.path}
-													alt="Image"
-													style={{ width: "30%" }}
-												/>
-											)}
-										</div>
-									</div>
-									<div className="response-div">
-										Response:
-										<p>{response.response}</p>
-										<button
-											onClick={() => handleShare(response.response, "ChatGPT")}
-										>
-											Share
-										</button>
-									</div>
-								</div>
-							))}
-						</div>
-					</div>
-					<div className="card">
-						<h4>Claude</h4>
-						<div className="fullscreen-btn" onClick={handleFullscreen}>
-							F
-						</div>
-
-						<div className="res-div">
-							{responses.claude.map((response, index) => (
-								<div
-									key={index}
-									ref={index === responses.claude.length - 1 ? claudeRef : null}
-								>
-									<div className="you-asked-div">
-										You asked:
-										<div>
-											<h5>{response.question}</h5>
-											{response.qImage && (
-												<img
-													src={"https://dash-boardllm.onrender.com/" + response.qImage.path}
-													alt="Image"
-													style={{ width: "30%" }}
-												/>
-											)}
-										</div>
-									</div>
-									<div className="response-div">
-										Response:
-										<p>{response.response}</p>
-										<button
-											onClick={() => handleShare(response.response, "Claude")}
-										>
-											Share
-										</button>
-									</div>
-								</div>
-							))}
-						</div>
-					</div>
-					<div className="card">
-						<h4>Groq</h4>
-						<div className="fullscreen-btn" onClick={handleFullscreen}>
-							F
-						</div>
-
-						<div className="res-div">
-							{responses.groq.map((response, index) => (
-								<div
-									key={index}
-									ref={index === responses.groq.length - 1 ? groqRef : null}
-								>
-									<div className="you-asked-div">
-										You asked:
-										<div>
-											<h5>{response.question}</h5>
-											{response.qImage && (
-												<img
-													src={"https://dash-boardllm.onrender.com/" + response.qImage.path}
-													alt="Image"
-													style={{ width: "30%" }}
-												/>
-											)}
-										</div>
-									</div>
-									<div className="response-div">
-										Response:
-										<p>{response.response}</p>
-										<button
-											onClick={() => handleShare(response.response, "Groq")}
-										>
-											Share
-										</button>
-									</div>
-								</div>
-							))}
-						</div>
-					</div>
+					{renderResponseCard("ChatGPT", responses.chatgpt, chatgptRef)}
+					{renderResponseCard("Claude", responses.claude, claudeRef)}
+					{renderResponseCard("Groq", responses.groq, groqRef)}
 				</div>
 			</div>
 
@@ -309,6 +242,7 @@ const LLMComparison = () => {
 					placeholder="Type your question here..."
 					value={question}
 					onChange={handleInputChange}
+					disabled={isLoading}
 				/>
 				<input
 					type="file"
@@ -332,7 +266,9 @@ const LLMComparison = () => {
 						</div>
 					</div>
 				)}
-				<button onClick={handleSubmit}>Submit</button>
+				<button onClick={handleSubmit} disabled={isLoading}>
+					{isLoading ? "Processing..." : "Submit"}
+				</button>
 			</div>
 		</div>
 	);
