@@ -17,15 +17,22 @@ export const AuthProvider = ({ children }) => {
 	useEffect(() => {
 		const unsubscribe = onAuthStateChanged(auth, (user) => {
 			if (user) {
-				fetch("https://dash-boardllm.onrender.com/api/auth/getUser", {
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({
-						uid: user.uid,
-					}),
-				})
+				fetch(
+					`${
+						process.env.NODE_ENV == "development"
+							? process.env.REACT_APP_BACKEND_HTTP_URL
+							: "https://dash-boardllm.onrender.com"
+					}/api/auth/getUser`,
+					{
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify({
+							uid: user.uid,
+						}),
+					}
+				)
 					.then((res) => res.json())
 					.then((data) => {
 						setCurrentUser(data.userData);
@@ -35,7 +42,7 @@ export const AuthProvider = ({ children }) => {
 						console.error("Error:", error);
 					});
 			}
-			setLoading(false)
+			setLoading(false);
 		});
 
 		return unsubscribe; // Cleanup subscription on unmount

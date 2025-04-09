@@ -103,8 +103,16 @@ const PhoneSignIn = () => {
 			toast.success("Phone verified");
 
 			const endpoint = isSignUp
-				? "https://dash-boardllm.onrender.com/api/auth/signup"
-				: "https://dash-boardllm.onrender.com/api/auth/login";
+				? `${
+						process.env.NODE_ENV == "development"
+							? process.env.REACT_APP_BACKEND_HTTP_URL
+							: "https://dash-boardllm.onrender.com"	
+				  }/api/auth/signup`
+				: `${
+						process.env.NODE_ENV == "development"
+							? process.env.REACT_APP_BACKEND_HTTP_URL
+							: "https://dash-boardllm.onrender.com"
+				  }/api/auth/login`;
 
 			const body = isSignUp
 				? { idToken, name, rollNumber, phoneNumber, color: getRandomColor() }

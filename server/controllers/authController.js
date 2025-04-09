@@ -78,21 +78,31 @@ exports.verifyUser = async (req, res) => {
 
 exports.getUser = async (req, res) => {
 	const { uid } = req.body;
+	console.log("Received data:", req.body);
 
 	try {
 		// Fetch user data from Firestore
 		const userDoc = await db.collection("users").doc(uid).get();
 
+		console.log("User document:", userDoc.data());
+
 		if (!userDoc.exists) {
 			// User does not exist, return error
+			console.log("User not found in Firestore for UID:", uid);
 			return res.status(404).json({ error: "User not found" });
 		}
 
 		// If user exists, return user data
 		const userData = userDoc.data();
+		console.log("User data fetched successfully:", userData);
 		res.status(200).json({ message: "User found", userData });
 	} catch (error) {
 		console.error("Error fetching user details:", error);
+		if (error.code === 16) {
+			console.error(
+				"UNAUTHENTICATED error: Ensure the service account key is valid and has the correct permissions."
+			);
+		}
 		res.status(500).json({ error: "Error fetching user details" });
 	}
 };
