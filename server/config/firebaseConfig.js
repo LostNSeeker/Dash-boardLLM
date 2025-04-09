@@ -1,14 +1,13 @@
-const admin = require("firebase-admin");
+var admin = require("firebase-admin");
 
-// Ensure the Firebase Admin SDK is initialized with a service account key
-if (!admin.apps.length) {
-	admin.initializeApp({
-		credential: admin.credential.cert(require("./serverJson.json")),
-		databaseURL: "https://dashboard-llm-default-rtdb.firebaseio.com", // Replace <your-project-id> with your Firebase project ID
-	});
+var serviceAccount = require("./serverJson.json");
 
-	console.log("Firebase Admin SDK initialized successfully.");
-}
+admin.initializeApp({
+	credential: admin.credential.cert(serviceAccount),
+	databaseURL: "https://dashboard-llm-default-rtdb.firebaseio.com"
+});
+
+console.log("Firebase Admin SDK initialized successfully.");
 
 const db = admin.firestore();
 
