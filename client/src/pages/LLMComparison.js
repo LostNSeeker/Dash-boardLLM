@@ -41,11 +41,7 @@ const LLMComparison = () => {
 			formData.append("userId", currentUser.uid);
 
 			const response = await fetch(
-				`${
-					process.env.NODE_ENV == "development"
-						? process.env.REACT_APP_BACKEND_HTTP_URL
-						: "https://dash-boardllm.onrender.com"
-				}/api/llm/queryWithImage`,
+				`${process.env.REACT_APP_BACKEND_HTTP_URL}/api/llm/queryWithImage`,
 				{
 					method: "POST",
 					body: formData,
@@ -55,11 +51,7 @@ const LLMComparison = () => {
 			return data;
 		} else {
 			const response = await fetch(
-				`${
-					process.env.NODE_ENV == "development"
-						? process.env.REACT_APP_BACKEND_HTTP_URL
-						: "https://dash-boardllm.onrender.com"
-				}/api/llm?question=${question}&userId=${currentUser.uid}`
+				`${process.env.REACT_APP_BACKEND_HTTP_URL}/api/llm?question=${question}&userId=${currentUser.uid}`
 			);
 			const data = await response.json();
 			return data;
@@ -163,11 +155,7 @@ const LLMComparison = () => {
 		if (!currentUser) return;
 		const fetchResponses = async () => {
 			const response = await fetch(
-				`${
-					process.env.NODE_ENV == "development"
-						? process.env.REACT_APP_BACKEND_HTTP_URL
-						: "https://dash-boardllm.onrender.com"
-				}/api/llm/getUserResponses?userId=${currentUser.uid}`
+				`${process.env.REACT_APP_BACKEND_HTTP_URL}/api/llm/getUserResponses?userId=${currentUser.uid}`
 			);
 			const data = await response.json();
 			console.log(data);
@@ -217,11 +205,7 @@ const LLMComparison = () => {
 								<h5>{response.question}</h5>
 								{response.qImage && (
 									<img
-										src={`${
-											process.env.NODE_ENV == "development"
-												? process.env.REACT_APP_BACKEND_HTTP_URL
-												: "https://dash-boardllm.onrender.com"
-										}/${response.qImage.path}`}
+										src={`${process.env.REACT_APP_BACKEND_HTTP_URL}/${response.qImage.path}`}
 										alt="Query"
 										style={{ width: "30%" }}
 									/>

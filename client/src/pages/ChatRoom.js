@@ -91,13 +91,7 @@ const ChatRoom = () => {
 			setInputValue(queryMessage);
 		}
 
-		ws.current = new WebSocket(
-			`${
-				process.env.NODE_ENV == "development"
-					? process.env.REACT_APP_BACKEND_WS_URL
-					: "wss://dash-boardllm.onrender.com"
-			}`
-		); // Adjust the URL if necessary
+		ws.current = new WebSocket(`${process.env.REACT_APP_BACKEND_WS_URL}`); // Adjust the URL if necessary
 
 		ws.current.onopen = () => {
 			console.log("Connected to WebSocket server");
