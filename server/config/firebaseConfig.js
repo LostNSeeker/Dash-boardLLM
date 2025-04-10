@@ -7,7 +7,7 @@ const serviceAccountPath =
 
 console.log("Service Account Path:", serviceAccountPath);
 
-var serviceAccount = require("./serverJson.json");
+var serviceAccount = require(serviceAccountPath);
 
 admin.initializeApp({
 	credential: admin.credential.cert(serviceAccount),
