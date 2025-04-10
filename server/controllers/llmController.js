@@ -29,28 +29,30 @@ async function getClaudeResponse(question) {
 		max_tokens: 1024,
 		messages: [{ role: "user", content: question }],
 	});
-	console.log(msg);
 	return msg.content[0].text;
 }
 
 async function getGroqResponse(question) {
-	return "Groq response";
-
-	const apiKey = "YOUR_GROQ_API_KEY";
+	const apiKey = process.env.GEMINI_API_KEY;
 	const response = await axios.post(
-		"https://api.groq.com/v1/groq",
+		"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" +
+			apiKey,
 		{
-			prompt: question,
-			max_tokens: 100,
+			contents: [
+				{
+					parts: [{ text: question }],
+				},
+			],
 		},
 		{
 			headers: {
-				Authorization: `Bearer ${apiKey}`,
 				"Content-Type": "application/json",
 			},
 		}
 	);
-	return response.data.choices[0].text.trim();
+
+	console.log("Gemini response:", response.data.candidates[0].content);
+	return response.data.candidates[0].content.parts[0].text;
 }
 
 exports.postQueryWithImage = async (req, res) => {
@@ -109,8 +111,8 @@ exports.postQueryWithoutImage = async (req, res) => {
 	try {
 		responses.groq.response = await getGroqResponse(question);
 	} catch (error) {
-		console.error("Error fetching Groq response:", error);
-		responses.groq.response = "Error fetching Groq response";
+		console.error("Error fetching Gemini response:", error);
+		responses.groq.response = "Error fetching Gemini response";
 	}
 
 	//save response to database

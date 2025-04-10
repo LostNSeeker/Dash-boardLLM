@@ -232,7 +232,7 @@ const LLMComparison = () => {
 				<div className="comparison-cards">
 					{renderResponseCard("ChatGPT", responses.chatgpt, chatgptRef)}
 					{renderResponseCard("Claude", responses.claude, claudeRef)}
-					{renderResponseCard("Groq", responses.groq, groqRef)}
+					{renderResponseCard("Gemini", responses.groq, groqRef)}
 				</div>
 			</div>
 
